@@ -69,16 +69,16 @@ def add_lora(
                     weight_name=name+".safetensors",
                     adapter_name=name,
                 )
-                print(f"{co.neutral}LoRA file: {co.blue}{path.join(lora_path, name + '.safetensors')}{co.green} : DETECTED{co.reset}")
+                print(f"{co.neutral}LoRA file: {co.green}{path.join(lora_path, name + '.safetensors')}{co.green}:{co.yellow}{lora_weights[i]}{co.reset}")
             elif path.isfile(path.join(lora_path, name + ".ckpt")):
                 pipe.load_lora_weights(
                     path.join(lora_path, name + ".ckpt"),
                     weight_name=name+".ckpt",
                     adapter_name=name,
                 )
-                print(f"{co.neutral}LoRA file: {co.blue}{path.join(lora_path, name + '.ckpt')}{co.green} : DETECTED{co.reset}")
+                print(f"{co.neutral}LoRA file: {co.green}{path.join(lora_path, name + '.ckpt')}{co.green}:{co.yellow}{lora_weights[i]}{co.reset}")
             else:
-                print(f"{co.neutral}LoRA file: {co.blue}{path.join(lora_path, name +'.safetensors')}{co.yellow} : UNDETECTED {co.neutral}Will not use this lora{co.reset}")
+                print(f"{co.neutral}LoRA file: {co.red}{path.join(lora_path, name +'.safetensors')}{co.yellow}:{co.neutral}Will not use this lora{co.reset}")
                 del lora_names[i]
                 del lora_weights[i]
     else:
@@ -127,12 +127,22 @@ def start(
             else:
                 embed_file = torch.load(path.join(embeddings_path, filename), map_location="cpu")
                 pipe.load_textual_inversion(embed_file["string_to_param"]["*"], token=fn, text_encoder=pipe.text_encoder, tokenizer=pipe.tokenizer)
-            print(f"{co.neutral}Embedding: {co.blue}{path.join(embeddings_path, filename)}{co.green} : DETECTED{co.reset}")
+            print(f"{co.neutral}Embedding: {co.green}{path.join(embeddings_path, filename)}{co.green}{co.reset}")
     pipe.to(device_name)
 
+
+    generators = []
+    seeds = []
     if seed == -1:
-        seed = random.randrange(0, 1000000)
-    generator = torch.Generator(device="cuda").manual_seed(seed)
+        for _ in range(batch_size):
+            seeds.append(random.randrange(0, 1000000))
+            generators.append(torch.Generator(device="cuda").manual_seed(seeds[-1]))
+    else:
+        seeds.append(seed)
+        generators.append(torch.Generator(device="cuda").manual_seed(seed[0]))
+    print(f"{co.neutral}SEEDS USED: {co.yellow}{seeds}{co.reset}")
+
+    # generator = torch.Generator(device="cuda").manual_seed(seed)
     
     prompt, pLora, pWeight = parse_prompt(prompt)
     negative_prompt, nLora, nWeight = parse_prompt(negative_prompt)
@@ -144,15 +154,16 @@ def start(
 
     clip_layers = pipe.text_encoder.text_model.encoder.layers
 
-    for _ in range(batch_size):
+    for i in range(batch_size):
         if clip_skip > 1:
             pipe.text_encoder.text_model.encoder.layers = clip_layers[:-(clip_skip)]
+        print(f"{co.neutral}INFERENCING WITH SEED: {co.yellow}{seeds[i]}{co.reset}")
         image = pipe(
             prompt=prompt,
             negative_prompt=negative_prompt,
             num_inference_steps=num_inference_steps,
             guidance_scale=guidance_scale,
-            generator=generator,
+            generator=generators[i],
             num_images_per_prompt=1,
             width=width,
             height=height
@@ -161,8 +172,8 @@ def start(
         if clip_skip > 1:
             pipe.text_encoder.text_model.encoder.layers = clip_layers
 
-        print(f"{co.green}saving to output/{seed}.png{co.reset}")
-        image.save(f"output/{seed}.png")
+        print(f"{co.neutral}saving to {co.green}output/{seeds[i]}.png{co.reset}")
+        image.save(f"output/{seeds[i]}.png")
 
         
 

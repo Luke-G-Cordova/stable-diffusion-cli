@@ -108,15 +108,15 @@ args = parser.parse_args()
 
 model_path = args.model_path
 if path.isdir(model_path):
-    print(f"{co.neutral}Model path: {co.blue}{model_path} {co.green}: DETECTED{co.reset}")
+    print(f"{co.neutral}Model path: {co.green}{model_path}{co.reset}")
 elif path.isfile(model_path):
     fname, ext = path.splitext(model_path)
     new_path = path.join(path.abspath("./models/"), fname)
     if path.isdir(new_path):
-        print(f"{co.blue}{new_path} {co.neutral}has already been created.\nUsing {co.blue}{new_path}{co.neutral} as model.{co.reset}")
+        print(f"{co.green}{new_path} {co.neutral}has already been created.\nUsing {co.green}{new_path}{co.neutral} as model.{co.reset}")
         model_path = new_path
     else:
-        print(f"{co.neutral}Attempting to convert {co.blue}{model_path}{co.neutral} to huggingface model{co.reset}")
+        print(f"{co.neutral}Attempting to convert {co.green}{model_path}{co.neutral} to huggingface model{co.reset}")
         from_safetensors = True if ext == ".safetensors" else False
 
         pipe = download_from_original_stable_diffusion_ckpt(
@@ -148,25 +148,25 @@ elif path.isfile(model_path):
         model_path = new_path
         pipe.save_pretrained(model_path, safe_serialization=True)
 else:
-    print(f"{co.neutral}Model path: {co.blue}{model_path}{co.neutral} :does not exist{co.reset}")
+    print(f"{co.neutral}Model path: {co.red}{model_path}{co.neutral} :does not exist{co.reset}")
     exit()
 
 embeddings_path = args.embeddings_path
 if path.isdir(embeddings_path):
-    print(f"{co.neutral}Embedding path: {co.blue}{embeddings_path}{co.green} : DETECTED{co.reset}")
+    print(f"{co.neutral}Embedding path: {co.green}{embeddings_path}{co.reset}")
 else:
     print(f"{co.yellow}Embeddings path not found{co.reset}")
 
 if args.prompt is None: 
     if path.isfile(args.prompt_file):
-        print(f"{co.neutral}Prompt path: {co.blue}{args.prompt_file}{co.green} : DETECTED{co.reset}")
+        print(f"{co.neutral}Prompt path: {co.green}{args.prompt_file}{co.reset}")
         with open(args.prompt_file, "r") as f:
             args.prompt = f.read().strip()
     else:
         raise ValueError(f"{co.red}--prompt was left unset and can not find {args.prompt_file}{co.reset}")
 if args.negative_prompt is None: 
     if path.isfile(args.negative_prompt_file):
-        print(f"{co.neutral}Prompt path: {co.blue}{args.negative_prompt_file}{co.green} : DETECTED{co.reset}")
+        print(f"{co.neutral}Prompt path: {co.green}{args.negative_prompt_file}{co.reset}")
         with open(args.negative_prompt_file, "r") as f:
             args.negative_prompt = f.read().strip()
     else:
