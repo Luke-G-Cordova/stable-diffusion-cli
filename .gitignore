@@ -1,0 +1,10 @@
+models/*
+prompts/*
+output/*
+
+*.safetensors
+*.ckpt
+*.pt
+*.txt
+
+__pycache__
