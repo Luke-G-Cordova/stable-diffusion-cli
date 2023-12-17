@@ -10,7 +10,6 @@ import re
 import tqdm
 import colors as co
 
-torch.backends.cuda.matmul.allow_tf32 = True
 
 
 # ['pndm', 'lms', 'ddim', 'euler', 'euler-ancestral', 'dpm']
@@ -155,11 +154,15 @@ def start(
     height=512,
     batch_size=1,
     embed_prompts=False,
+    allow_tf32=False,
 ):
     if torch.cuda.is_available():
         device_name = torch.device("cuda")
     else:
         device_name = torch.device("cpu")
+    if allow_tf32:
+        torch.backends.cuda.matmul.allow_tf32 = True
+        
     print(f"{co.neutral}Using device: {co.blue}{device_name}{co.neutral} : for inference{co.reset}")
 
     scheduler = get_scheduler_import(scheduler_type).from_pretrained(
@@ -216,7 +219,7 @@ def start(
 
     clip_layers = pipe.text_encoder.text_model.encoder.layers
 
-    # pipe.enable_xformers_memory_efficient_attention()
+    pipe.enable_xformers_memory_efficient_attention()
     for i in range(batch_size):
         if clip_skip > 1:
             pipe.text_encoder.text_model.encoder.layers = clip_layers[:-(clip_skip)]

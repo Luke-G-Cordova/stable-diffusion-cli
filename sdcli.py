@@ -119,6 +119,11 @@ parser.add_argument(
     action="store_true",
     help="Use this flag to find and list lora. This will only look in the models/lora directory."
 )
+parser.add_argument(
+    "--allow_tf32",
+    action="store_true",
+    help="inference will go faster with slight inaccuracy"
+)
 
 args = parser.parse_args()
 
@@ -224,6 +229,7 @@ if args.task == "txt2img":
         guidance_scale=args.guidance_scale,
         batch_size=args.batch_size,
         embed_prompts=args.embed_prompts,
+        allow_tf32=args.allow_tf32,
     )
 else:
     print(f"{co.red}No current support for {args.task}{co.reset}")
