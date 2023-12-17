@@ -4,6 +4,7 @@ from os import path
 import os
 import txt2img
 import colors as co
+import json
 
 parser = argparse.ArgumentParser()
 
@@ -103,8 +104,42 @@ parser.add_argument(
     type=int,
     help="batch size"
 )
+parser.add_argument(
+    "--embed_prompts",
+    action="store_true",
+    help="For longer prompts with 77 or more tokens use this flag to first make them embeddings."
+)
+parser.add_argument(
+    "--help_list_lora",
+    action="store_true",
+    help="Use this flag to find and list lora. This will only look in the models/lora directory."
+)
+parser.add_argument(
+    "--help_list_models",
+    action="store_true",
+    help="Use this flag to find and list lora. This will only look in the models/lora directory."
+)
 
 args = parser.parse_args()
+
+if args.help_list_lora:
+    if path.isdir("./models/lora"):
+        for filename in os.listdir("./models/lora"):
+            lora_name, _ = path.splitext(filename)
+            print(f"{co.green}{lora_name}{co.reset}")
+    else:
+        print(f"{co.neutral}Could not find directory: {co.red}models/lora{co.reset}")
+    exit()
+if args.help_list_models:
+    if path.isdir("./models"):
+        for filename in os.listdir("./models"):
+            if path.isdir(path.join("./models", filename)):
+                config_file = path.join("./models", filename, "model_index.json")
+                if path.isfile(config_file):
+                    with open(config_file, "r") as f:
+                        jsConf = json.loads(f.read())
+                        print(f"{co.neutral}MODEL: {co.green}{filename}{co.neutral} :SCHEDULER: {co.yellow}{jsConf['scheduler'][1]}{co.reset}" )
+    exit()
 
 model_path = args.model_path
 if path.isdir(model_path):
@@ -187,7 +222,8 @@ if args.task == "txt2img":
         lora_path=args.lora_path,
         num_inference_steps=args.inference_steps,
         guidance_scale=args.guidance_scale,
-        batch_size=args.batch_size
+        batch_size=args.batch_size,
+        embed_prompts=args.embed_prompts,
     )
 else:
     print(f"{co.red}No current support for {args.task}{co.reset}")

@@ -86,6 +86,59 @@ def add_lora(
 
     pipe.set_adapters(lora_names, lora_weights)
 
+def get_prompt_embeddings(
+    pipe,
+    prompt,
+    negative_prompt,
+    split_character = ",",
+    device = torch.device("cpu")
+):
+    max_length = pipe.tokenizer.model_max_length
+    # Simple method of checking if the prompt is longer than the negative
+    # prompt - split the input strings using `split_character`.
+    count_prompt = len(prompt.split(split_character))
+    count_negative_prompt = len(negative_prompt.split(split_character))
+
+    # If prompt is longer than negative prompt.
+    if count_prompt >= count_negative_prompt:
+        input_ids = pipe.tokenizer(
+            prompt, return_tensors = "pt", truncation = False
+        ).input_ids.to(device)
+        shape_max_length = input_ids.shape[-1]
+        negative_ids = pipe.tokenizer(
+            negative_prompt,
+            truncation = False,
+            padding = "max_length",
+            max_length = shape_max_length,
+            return_tensors = "pt"
+        ).input_ids.to(device)
+
+    # If negative prompt is longer than prompt.
+    else:
+        negative_ids = pipe.tokenizer(
+            negative_prompt, return_tensors = "pt", truncation = False
+        ).input_ids.to(device)
+        shape_max_length = negative_ids.shape[-1]
+        input_ids = pipe.tokenizer(
+            prompt,
+            return_tensors = "pt",
+            truncation = False,
+            padding = "max_length",
+            max_length = shape_max_length
+        ).input_ids.to(device)
+
+    # Concatenate the individual prompt embeddings.
+    concat_embeds = []
+    neg_embeds = []
+    for i in range(0, shape_max_length, max_length):
+        concat_embeds.append(
+            pipe.text_encoder(input_ids[:, i: i + max_length])[0]
+        )
+        neg_embeds.append(
+            pipe.text_encoder(negative_ids[:, i: i + max_length])[0]
+        )
+
+    return torch.cat(concat_embeds, dim = 1), torch.cat(neg_embeds, dim = 1)
 
 def start(
     model_path, 
@@ -101,6 +154,7 @@ def start(
     width=512,
     height=512,
     batch_size=1,
+    embed_prompts=False,
 ):
     if torch.cuda.is_available():
         device_name = torch.device("cuda")
@@ -139,13 +193,21 @@ def start(
             generators.append(torch.Generator(device="cuda").manual_seed(seeds[-1]))
     else:
         seeds.append(seed)
-        generators.append(torch.Generator(device="cuda").manual_seed(seed[0]))
+        generators.append(torch.Generator(device="cuda").manual_seed(seeds[0]))
     print(f"{co.neutral}SEEDS USED: {co.yellow}{seeds}{co.reset}")
 
     # generator = torch.Generator(device="cuda").manual_seed(seed)
     
     prompt, pLora, pWeight = parse_prompt(prompt)
     negative_prompt, nLora, nWeight = parse_prompt(negative_prompt)
+    if embed_prompts:
+        prompt_embeds, negative_prompt_embeds = get_prompt_embeddings(
+            pipe, 
+            prompt,
+            negative_prompt,
+            split_character = ",",
+            device = device_name
+        )
 
     print(f"{co.neutral}PROMPT: {co.reset}{prompt}")
     print(f"{co.neutral}NEGATIVE_PROMPT: {co.reset}{negative_prompt}")
@@ -154,20 +216,33 @@ def start(
 
     clip_layers = pipe.text_encoder.text_model.encoder.layers
 
+    # pipe.enable_xformers_memory_efficient_attention()
     for i in range(batch_size):
         if clip_skip > 1:
             pipe.text_encoder.text_model.encoder.layers = clip_layers[:-(clip_skip)]
         print(f"{co.neutral}INFERENCING WITH SEED: {co.yellow}{seeds[i]}{co.reset}")
-        image = pipe(
-            prompt=prompt,
-            negative_prompt=negative_prompt,
-            num_inference_steps=num_inference_steps,
-            guidance_scale=guidance_scale,
-            generator=generators[i],
-            num_images_per_prompt=1,
-            width=width,
-            height=height
-        ).images[0]
+        if embed_prompts:
+            image = pipe(
+                prompt_embeds=prompt_embeds,
+                negative_prompt_embeds=negative_prompt_embeds,
+                num_inference_steps=num_inference_steps,
+                guidance_scale=guidance_scale,
+                generator=generators[i],
+                num_images_per_prompt=1,
+                width=width,
+                height=height
+            ).images[0]
+        else:
+            image = pipe(
+                prompt=prompt,
+                negative_prompt=negative_prompt,
+                num_inference_steps=num_inference_steps,
+                guidance_scale=guidance_scale,
+                generator=generators[i],
+                num_images_per_prompt=1,
+                width=width,
+                height=height
+            ).images[0]
 
         if clip_skip > 1:
             pipe.text_encoder.text_model.encoder.layers = clip_layers
