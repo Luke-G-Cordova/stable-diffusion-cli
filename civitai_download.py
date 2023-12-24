@@ -14,9 +14,10 @@ def download_file_vid(version_id):
             os.mkdir(dir)
         destination = path.join(dir, jres["files"][0]["name"]) 
         
+        # use wget to get around user agent stuff
         subprocess.run(
             [
-                "", 
+                "C:/Program Files (x86)/GnuWin32/bin/wget.exe", 
                 f"https://civitai.com/api/download/models/{version_id}", 
                 "-O", 
                 destination,

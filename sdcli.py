@@ -3,7 +3,7 @@ from diffusers.pipelines.stable_diffusion.convert_from_ckpt import download_from
 from os import path
 import os
 import txt2img
-import colors as co
+import util.colors as co
 import json
 
 parser = argparse.ArgumentParser()
@@ -99,6 +99,12 @@ parser.add_argument(
     help="path to directory storing lora"
 )
 parser.add_argument(
+    "--out_dir",
+    default="output",
+    type=str,
+    help="path to store generated images and generation data"
+)
+parser.add_argument(
     "--batch_size",
     default=1,
     type=int,
@@ -123,6 +129,11 @@ parser.add_argument(
     "--allow_tf32",
     action="store_true",
     help="inference will go faster with slight inaccuracy"
+)
+parser.add_argument(
+    "--no_gen_data",
+    action="store_false",
+    help="Setting this flag prevents generation data from being stored with images"
 )
 
 args = parser.parse_args()
@@ -230,6 +241,8 @@ if args.task == "txt2img":
         batch_size=args.batch_size,
         embed_prompts=args.embed_prompts,
         allow_tf32=args.allow_tf32,
+        save_generation_data=args.no_gen_data,
+        out_dir=args.out_dir
     )
 else:
     print(f"{co.red}No current support for {args.task}{co.reset}")
