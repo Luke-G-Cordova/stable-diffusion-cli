@@ -1,5 +1,7 @@
 import torch
 import re
+from os import path
+import json
 
 def get_prompt_embeddings(
     pipe,
@@ -63,15 +65,21 @@ def parse_prompt(prompt):
     weight = []
     i = 0
     while i < len(pieces):
-        s = re.findall("\<lora:.+:[0-9.]+\>", pieces[i])
+        s = re.findall("\<lora:.+:[0-9.]+\:?\w*?\>", pieces[i])
         if len(s) > 0:
             for mat in s:
+                print(mat)
                 # get lora name
                 mat = mat[1:]
                 mat = mat[:-1]
                 lora_info = mat.split(":")
                 name.append(lora_info[1])
                 weight.append(float(lora_info[2]))
+                if len(lora_info) == 4:
+                    with open(path.join("models", "lora", lora_info[1], "info.json"), 'r') as f:
+                        jf = json.loads(f.read())
+                        for p in jf["trainedWords"]:
+                            pieces.append(p)
             pieces.remove(pieces[i])
         else:
             i+=1
