@@ -21,10 +21,18 @@ def get_scheduler_import(scheduler_type):
     return sc
 
 def generation_data(
-    lora_data,
     prompt, 
     negative_prompt,
-    embeddings_data
+    lora_data,
+    embeddings_data,
+    model_path,
+    scheduler_type,
+    seed,
+    clip_skip,
+    inference_steps,
+    width,
+    height,
+    guidance_scale
 ):
     # lora_data = [ (filename, weight), (filename, weight) ]
     lora_objs = {}
@@ -43,6 +51,14 @@ def generation_data(
     return {
         "prompt": prompt, 
         "negative_prompt":negative_prompt,
+        "model_path":model_path,
+        "scheduler_type":scheduler_type,
+        "seed":seed,
+        "clip_skip":clip_skip,
+        "inference_steps":inference_steps,
+        "width":width,
+        "height":height,
         "lora": lora_objs,
         "textual_inversion_embeddings":  embeddings_objs,
+        "guidance_scale":guidance_scale
     }

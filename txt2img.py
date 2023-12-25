@@ -142,11 +142,17 @@ def start(
         
         if save_generation_data:
             with open(f"output/{seeds[i]}/generation_data.json", 'w') as f:
-                f.write(
-                    json.dumps(generation_data(
-                        lora_data,
-                        prompt, 
-                        negative_prompt,
-                        embeddings_data
-                    ))
-                )
+                f.write(json.dumps(generation_data(
+                    prompt, 
+                    negative_prompt,
+                    lora_data,
+                    embeddings_data,
+                    model_path,
+                    scheduler_type,
+                    seeds[i],
+                    clip_skip,
+                    num_inference_steps,
+                    width,
+                    height,
+                    guidance_scale
+                )))
