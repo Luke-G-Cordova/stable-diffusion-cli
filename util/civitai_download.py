@@ -5,7 +5,7 @@ import os
 import json
 import urllib.parse as url
 from diffusers.pipelines.stable_diffusion.convert_from_ckpt import download_from_original_stable_diffusion_ckpt
-import util.colors as co
+import colors as co
 
 def convert_file_to_diffusers_ckpt(
     model_path,
