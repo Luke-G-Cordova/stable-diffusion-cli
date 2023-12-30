@@ -1,10 +1,11 @@
 import argparse
-from diffusers.pipelines.stable_diffusion.convert_from_ckpt import download_from_original_stable_diffusion_ckpt
 from os import path
 import os
 import txt2img
+from civitai_download import convert_file_to_diffusers_ckpt, query_for_file
 import util.colors as co
 import json
+import re
 
 parser = argparse.ArgumentParser()
 
@@ -157,50 +158,42 @@ if args.help_list_models:
                         print(f"{co.neutral}MODEL: {co.green}{filename}{co.neutral} :SCHEDULER: {co.yellow}{jsConf['scheduler'][1]}{co.reset}" )
     exit()
 
-model_path = args.model_path
+_, f = path.split(args.model_path)
+f, _ = path.splitext(f)
+model_path = args.model_path if \
+    path.isdir(args.model_path) or \
+    path.isfile(args.model_path) else \
+    path.join(
+        "models", 
+        "checkpoint", 
+        f, 
+    )
+
 if path.isdir(model_path):
     print(f"{co.neutral}Model path: {co.green}{model_path}{co.reset}")
 elif path.isfile(model_path):
-    fname, ext = path.splitext(model_path)
-    new_path = path.join(path.abspath("./models/"), fname)
-    if path.isdir(new_path):
-        print(f"{co.green}{new_path} {co.neutral}has already been created.\nUsing {co.green}{new_path}{co.neutral} as model.{co.reset}")
-        model_path = new_path
-    else:
-        print(f"{co.neutral}Attempting to convert {co.green}{model_path}{co.neutral} to huggingface model{co.reset}")
-        from_safetensors = True if ext == ".safetensors" else False
-
-        pipe = download_from_original_stable_diffusion_ckpt(
-            checkpoint_path_or_dict=model_path,
-            original_config_file=None,
-            image_size=None,
-            prediction_type=None,
-            model_type=None,
-            extract_ema=False,
-            scheduler_type=args.scheduler_type,
-            num_in_channels=None,
-            upcast_attention=False,
-            from_safetensors=from_safetensors,
-            device="cuda",
-            stable_unclip=None,
-            stable_unclip_prior=None,
-            clip_stats_path="",
-            controlnet=False,
-            vae_path=None,
-            pipeline_class=None,
-        )
-        # if args.half:
-        #     pipe.to(torch_dtype=torch.float16)
-
-        # if args.controlnet:
-        #     # only save the controlnet model
-        #     pipe.controlnet.save_pretrained(args.dump_path, safe_serialization=args.to_safetensors)
-        # else:
-        model_path = new_path
-        pipe.save_pretrained(model_path, safe_serialization=True)
+    convert_file_to_diffusers_ckpt(model_path, args.scheduler_type)
+    print(f"{co.neutral}Model path: {co.green}{model_path}{co.reset}")
 else:
-    print(f"{co.neutral}Model path: {co.red}{model_path}{co.neutral} :does not exist{co.reset}")
-    exit()
+    query = path.splitext(path.split(model_path)[1])[0]
+    query = re.sub("(_|)v[0-9.]+", "", query, flags=re.I)
+    query = re.sub("_" , "", query)
+    query = re.split("(?<!^)[A-Z](?=[a-z])", query)
+    query = " ".join(query)
+    query_for_file(query, types=["Checkpoint"], sort="Highest Rated", period="AllTime", limit=1) 
+    convert_file_to_diffusers_ckpt(model_path, args.scheduler_type, force=True)
+    _, fn = path.split(model_path)
+    fn, ext = path.splitext(fn)
+    rm_path = f"models/checkpoint/{fn}/{fn}"
+    if ext == "":
+        if path.isfile(rm_path + ".safetensors"):
+            os.remove(rm_path + ".safetensors")
+        elif path.isfile(rm_path + ".ckpt"):
+            os.remove(rm_path + ".ckpt")
+        else:
+            print(f"{co.red}Could not find path: {rm_path}.safetensors to remove{co.reset}")
+    else:
+        os.remove(rm_path + ext)
 
 embeddings_path = args.embeddings_path
 if path.isdir(embeddings_path):

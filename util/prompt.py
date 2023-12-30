@@ -65,10 +65,9 @@ def parse_prompt(prompt):
     weight = []
     i = 0
     while i < len(pieces):
-        s = re.findall("\<lora:.+:[0-9.]+\:?\w*?\>", pieces[i])
+        s = re.findall("\<lora:.+:[0-9.]+\:?\w*?\>", pieces[i].strip())
         if len(s) > 0:
             for mat in s:
-                print(mat)
                 # get lora name
                 mat = mat[1:]
                 mat = mat[:-1]
@@ -79,8 +78,10 @@ def parse_prompt(prompt):
                     with open(path.join("models", "lora", lora_info[1], "info.json"), 'r') as f:
                         jf = json.loads(f.read())
                         for p in jf["trainedWords"]:
-                            pieces.append(p)
+                            if p.strip() != "":
+                                pieces.append(p.strip())
             pieces.remove(pieces[i])
         else:
+            pieces[i] = pieces[i].strip()
             i+=1
     return ",".join(pieces), name, weight
