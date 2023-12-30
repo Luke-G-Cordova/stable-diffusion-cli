@@ -1,6 +1,7 @@
 models/*
 prompts/*
 output/*
+image_inputs/*
 
 *.safetensors
 *.ckpt

@@ -2,7 +2,8 @@ import argparse
 from os import path
 import os
 import txt2img
-from civitai_download import convert_file_to_diffusers_ckpt, query_for_file
+import img2img
+from util.civitai_download import convert_file_to_diffusers_ckpt, query_for_file
 import util.colors as co
 import json
 import re
@@ -136,6 +137,18 @@ parser.add_argument(
     action="store_false",
     help="Setting this flag prevents generation data from being stored with images"
 )
+parser.add_argument(
+    "--image_path",
+    default=None,
+    type=str,
+    help="if task is img2img, this path indicates the input image"
+)
+parser.add_argument(
+    "--image_strength",
+    default=.8,
+    type=float,
+    help="if task is img2img, this path indicates the input image"
+)
 
 args = parser.parse_args()
 
@@ -235,7 +248,29 @@ if args.task == "txt2img":
         embed_prompts=args.embed_prompts,
         allow_tf32=args.allow_tf32,
         save_generation_data=args.no_gen_data,
-        out_dir=args.out_dir
+        out_dir=args.out_dir,
+    )
+elif args.task == "img2img":
+    img2img.start(
+        model_path=model_path,
+        scheduler_type=args.scheduler_type,
+        prompt=args.prompt,
+        negative_prompt=args.negative_prompt,
+        embeddings_path=embeddings_path,
+        width=args.width,
+        height=args.height,
+        seed=args.seed,
+        clip_skip=args.clip_skip,
+        lora_path=args.lora_path,
+        num_inference_steps=args.inference_steps,
+        guidance_scale=args.guidance_scale,
+        batch_size=args.batch_size,
+        embed_prompts=args.embed_prompts,
+        allow_tf32=args.allow_tf32,
+        save_generation_data=args.no_gen_data,
+        out_dir=args.out_dir,
+        image_path=args.image_path,
+        image_strength=args.image_strength,
     )
 else:
     print(f"{co.red}No current support for {args.task}{co.reset}")
