@@ -58,14 +58,22 @@ def get_prompt_embeddings(
     return torch.cat(concat_embeds, dim = 1), torch.cat(neg_embeds, dim = 1)
 
 def parse_prompt(prompt):
-    pieces = prompt.split(",")
+    prompt = prompt.strip()
+    lines = prompt.split("\n")
+    pieces = []
+    for line in lines:
+        line = line.split("//")[0]
+        ls = line.split(",")
+        for l in ls:
+            if l.strip() != "":
+                pieces.append(l.strip())
 
     # detect lora
     name = []
     weight = []
     i = 0
     while i < len(pieces):
-        s = re.findall("\<lora:.+:[0-9.]+\:?\w*?\>", pieces[i].strip())
+        s = re.findall("\<lora:.+:[0-9.]+\:?\w*?\>", pieces[i])
         if len(s) > 0:
             for mat in s:
                 # get lora name
