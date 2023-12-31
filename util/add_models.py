@@ -1,3 +1,4 @@
+import json
 from os import path
 import os
 import util.colors as co
@@ -40,43 +41,47 @@ def add_lora(
     pipe.set_adapters(lora_names, lora_weights)
     return lora_gen_data_files
 
-
-def add_text_inversion_embeddings(
-    embeddings_path,
-    pipe,
-):
-    embeddings_data = []
+def  get_trained_textual_inversions(embeddings_path):
+    possible_embeddings = {}
     if path.isdir(embeddings_path):
         for dirname in os.listdir(embeddings_path):
             if path.isdir(path.join(embeddings_path, dirname)):
-                filename = path.join(embeddings_path, dirname, dirname)
-                if path.isfile(filename + ".safetensors"):
-                    filename = filename + ".safetensors"
-                    embed_file = load_file(filename, device="cpu")
-                    pipe.load_textual_inversion(embed_file["emb_params"], token=dirname, text_encoder=pipe.text_encoder, tokenizer=pipe.tokenizer)
-                    print(f"{co.neutral}Embedding: {co.green}{filename}{co.green}{co.reset}")
-                    if path.isfile(path.join(embeddings_path, dirname, "info.json")):
-                        embeddings_data.append(path.join(embeddings_path, dirname, "info.json"))
-                elif path.isfile(filename + ".pt"):
-                    filename = filename + ".pt"
-                    embed_file = torch.load(filename, map_location="cpu")
-                    pipe.load_textual_inversion(embed_file["string_to_param"]["*"], token=dirname, text_encoder=pipe.text_encoder, tokenizer=pipe.tokenizer)
-                    print(f"{co.neutral}Embedding: {co.green}{filename}{co.green}{co.reset}")
-                    if path.isfile(path.join(embeddings_path, dirname, "info.json")):
-                        embeddings_data.append(path.join(embeddings_path, dirname, "info.json"))
+                filename = path.join(embeddings_path, dirname, "info.json")
+                if path.isfile(filename):
+                    with open(filename, 'r') as f:
+                        jf = json.loads(f.read())
+                        if path.isfile(path.join(embeddings_path, dirname, jf["files"][0]["name"])):
+                            for word in jf["trainedWords"]:
+                                possible_embeddings[word] = path.join(embeddings_path, dirname, jf["files"][0]["name"])
+                            possible_embeddings[dirname] = path.join(embeddings_path, dirname, jf["files"][0]["name"])
+                        else:
+                            print(f"{co.red}{path.join(embeddings_path, dirname, jf['files'][0]['name'])} does not exist{co.reset}")
                 else:
-                    print(f"{co.neutral}Unrecognized file format: {co.red}{filename}{co.neutral} :Embeddings must be of type .safetensors or .pt")
-            elif path.isfile(path.join(embeddings_path, dirname)):
-                fn, ext = path.splitext(dirname)
-                filename = dirname
-                if ext == ".safetensors":
-                    embed_file = load_file(path.join(embeddings_path, filename), device="cpu")
-                    pipe.load_textual_inversion(embed_file["emb_params"], token=fn, text_encoder=pipe.text_encoder, tokenizer=pipe.tokenizer)
-                    print(f"{co.neutral}Embedding: {co.green}{path.join(embeddings_path, filename)}{co.green}{co.reset}")
-                else:
-                    embed_file = torch.load(path.join(embeddings_path, filename), map_location="cpu")
-                    pipe.load_textual_inversion(embed_file["string_to_param"]["*"], token=fn, text_encoder=pipe.text_encoder, tokenizer=pipe.tokenizer)
-                    print(f"{co.neutral}Embedding: {co.green}{path.join(embeddings_path, filename)}{co.green}{co.reset}")
+                    print(f"{co.red}{filename} does not exist{co.reset}")
     else:
         print(f"{co.neutral}Cannot find embedding path: {co.red}{embeddings_path}{co.neutral} :Will not use embeddings{co.reset} ")
+    return possible_embeddings
+
+def add_text_inversion_embeddings(
+    text_inversion_files,
+    pipe,
+):
+    embeddings_data = []
+    for file in text_inversion_files:
+        if path.isfile(file):
+            dir, _ = path.split(file)
+            _, dirname = path.split(dir)
+            _, ext = path.splitext(file)
+            if ext == ".safetensors":
+                embed_file = load_file(file, device="cpu")
+                pipe.load_textual_inversion(embed_file["emb_params"], token=dirname, text_encoder=pipe.text_encoder, tokenizer=pipe.tokenizer)
+            elif ext == ".pt":
+                embed_file = torch.load(file, map_location="cpu")
+                pipe.load_textual_inversion(embed_file["string_to_param"]["*"], token=dirname, text_encoder=pipe.text_encoder, tokenizer=pipe.tokenizer)
+            else:
+                print(f"{co.neutral}Unrecognized file format: {co.red}{file}{co.neutral} :Embeddings must be of type .safetensors or .pt")
+                continue
+            print(f"{co.neutral}Embedding: {co.green}{file}{co.green}{co.reset}")
+            if path.isfile(path.join(dir, "info.json")):
+                embeddings_data.append(path.join(dir, "info.json"))
     return embeddings_data

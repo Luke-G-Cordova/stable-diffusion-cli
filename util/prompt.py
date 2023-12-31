@@ -57,7 +57,7 @@ def get_prompt_embeddings(
 
     return torch.cat(concat_embeds, dim = 1), torch.cat(neg_embeds, dim = 1)
 
-def parse_prompt(prompt):
+def parse_prompt(prompt, trained_textual_inversions):
     prompt = prompt.strip()
     lines = prompt.split("\n")
     pieces = []
@@ -68,7 +68,8 @@ def parse_prompt(prompt):
             if l.strip() != "":
                 pieces.append(l.strip())
 
-    # detect lora
+    used_textual_inversions = []
+    # detect lora and textual inversions
     name = []
     weight = []
     i = 0
@@ -91,5 +92,7 @@ def parse_prompt(prompt):
             pieces.remove(pieces[i])
         else:
             pieces[i] = pieces[i].strip()
+            if pieces[i] in trained_textual_inversions:
+                used_textual_inversions.append(trained_textual_inversions[pieces[i]])
             i+=1
-    return ",".join(pieces), name, weight
+    return ", ".join(pieces), name, weight, used_textual_inversions

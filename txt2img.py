@@ -1,5 +1,6 @@
 from diffusers import(
-  DiffusionPipeline
+  DiffusionPipeline,
+  AutoencoderKL,
 )
 import os
 from os import path
@@ -9,7 +10,8 @@ import util.colors as co
 import json
 from util.add_models import ( 
     add_lora, 
-    add_text_inversion_embeddings 
+    add_text_inversion_embeddings,
+    get_trained_textual_inversions 
 )
 from util.data import (
     generation_data,
@@ -49,20 +51,38 @@ def start(
      
     print(f"{co.neutral}Using device: {co.blue}{device_name}{co.neutral} : for inference{co.reset}")
 
+    trained_textual_inversions = get_trained_textual_inversions(embeddings_path)
+    print(trained_textual_inversions)
+
+    # parse the prompt and make embeddings if needed
+    prompt, pLora, pWeight, pTextInvs = parse_prompt(prompt, trained_textual_inversions)
+    negative_prompt, nLora, nWeight, nTextInvs = parse_prompt(negative_prompt, trained_textual_inversions)
+    if embed_prompts:
+        prompt_embeds, negative_prompt_embeds = get_prompt_embeddings(
+            pipe, 
+            prompt,
+            negative_prompt,
+            split_character = ",",
+            device = device_name
+        )
+
+    print(f"{co.neutral}PROMPT: {co.reset}{prompt}")
+    print(f"{co.neutral}NEGATIVE_PROMPT: {co.reset}{negative_prompt}")
+
     # set scheduler
     scheduler = get_scheduler_import(scheduler_type).from_pretrained(
         model_path,
-        subfolder="scheduler"
+        subfolder="scheduler",
     )
     pipe = DiffusionPipeline.from_pretrained(
         model_path,
         scheduler=scheduler,
         safety_checker=None,
-        use_safetensors=True
+        use_safetensors=True,
     )
 
     # load embeddings
-    embeddings_data = add_text_inversion_embeddings(embeddings_path, pipe)
+    embeddings_data = add_text_inversion_embeddings(pTextInvs+nTextInvs, pipe)
 
     pipe.to(device_name)
 
@@ -77,21 +97,6 @@ def start(
         seeds.append(seed)
         generators.append(torch.Generator(device="cuda").manual_seed(seeds[0]))
     print(f"{co.neutral}SEEDS USED: {co.yellow}{seeds}{co.reset}")
-
-    # parse the prompt and make embeddings if needed
-    prompt, pLora, pWeight = parse_prompt(prompt)
-    negative_prompt, nLora, nWeight = parse_prompt(negative_prompt)
-    if embed_prompts:
-        prompt_embeds, negative_prompt_embeds = get_prompt_embeddings(
-            pipe, 
-            prompt,
-            negative_prompt,
-            split_character = ",",
-            device = device_name
-        )
-
-    print(f"{co.neutral}PROMPT: {co.reset}{prompt}")
-    print(f"{co.neutral}NEGATIVE_PROMPT: {co.reset}{negative_prompt}")
 
     # load lora
     lora_data = add_lora(pipe=pipe, lora_names=pLora+nLora, lora_weights=pWeight+nWeight, lora_path=lora_path)
@@ -115,7 +120,7 @@ def start(
                 generator=generators[i],
                 num_images_per_prompt=1,
                 width=width,
-                height=height
+                height=height,
             ).images[0]
         else:
             image = pipe(
