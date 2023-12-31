@@ -58,14 +58,6 @@ def start(
     # parse the prompt and make embeddings if needed
     prompt, pLora, pWeight, pTextInvs = parse_prompt(prompt, trained_textual_inversions)
     negative_prompt, nLora, nWeight, nTextInvs = parse_prompt(negative_prompt, trained_textual_inversions)
-    if embed_prompts:
-        prompt_embeds, negative_prompt_embeds = get_prompt_embeddings(
-            pipe, 
-            prompt,
-            negative_prompt,
-            split_character = ",",
-            device = device_name
-        )
 
     print(f"{co.neutral}PROMPT: {co.reset}{prompt}")
     print(f"{co.neutral}NEGATIVE_PROMPT: {co.reset}{negative_prompt}")
@@ -98,8 +90,18 @@ def start(
 
     # load embeddings
     embeddings_data = add_text_inversion_embeddings(pTextInvs+nTextInvs, pipe)
-
+    
     pipe.to(device_name)
+    
+    if embed_prompts:
+        prompt_embeds, negative_prompt_embeds = get_prompt_embeddings(
+            pipe, 
+            prompt,
+            negative_prompt,
+            split_character = ",",
+            device = device_name
+        )
+
 
     # set seeds
     generators = []
