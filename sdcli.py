@@ -149,6 +149,12 @@ parser.add_argument(
     type=float,
     help="if task is img2img, this path indicates the input image"
 )
+parser.add_argument(
+    "--vae_path",
+    default=None,
+    type=str,
+    help="path to custom vae file. If none is provided, will attempt to use default."
+)
 
 args = parser.parse_args()
 
@@ -249,6 +255,7 @@ if args.task == "txt2img":
         allow_tf32=args.allow_tf32,
         save_generation_data=args.no_gen_data,
         out_dir=args.out_dir,
+        vae_path=args.vae_path,
     )
 elif args.task == "img2img":
     img2img.start(

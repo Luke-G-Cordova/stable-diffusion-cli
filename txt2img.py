@@ -1,6 +1,7 @@
 from diffusers import(
   DiffusionPipeline,
-  AutoencoderKL,
+  StableDiffusionKDiffusionPipeline,
+  AutoencoderKL
 )
 import os
 from os import path
@@ -39,7 +40,8 @@ def start(
     embed_prompts=False,
     allow_tf32=False,
     save_generation_data=True,
-    out_dir="output"
+    out_dir="output",
+    vae_path=None,
 ):
     # default cuda
     if torch.cuda.is_available():
@@ -52,7 +54,6 @@ def start(
     print(f"{co.neutral}Using device: {co.blue}{device_name}{co.neutral} : for inference{co.reset}")
 
     trained_textual_inversions = get_trained_textual_inversions(embeddings_path)
-    print(trained_textual_inversions)
 
     # parse the prompt and make embeddings if needed
     prompt, pLora, pWeight, pTextInvs = parse_prompt(prompt, trained_textual_inversions)
@@ -73,13 +74,27 @@ def start(
     scheduler = get_scheduler_import(scheduler_type).from_pretrained(
         model_path,
         subfolder="scheduler",
+        use_karras_sigmas=True,
     )
-    pipe = DiffusionPipeline.from_pretrained(
-        model_path,
-        scheduler=scheduler,
-        safety_checker=None,
-        use_safetensors=True,
-    )
+    if vae_path is not None:
+        vae = AutoencoderKL.from_single_file(
+            vae_path, use_safetensors=True
+        ) 
+        pipe = DiffusionPipeline.from_pretrained(
+            model_path,
+            vae=vae,
+            scheduler=scheduler,
+            safety_checker=None,
+            use_safetensors=True,
+        )
+    else:
+        pipe = DiffusionPipeline.from_pretrained(
+            model_path,
+            scheduler=scheduler,
+            safety_checker=None,
+            use_safetensors=True,
+        )
+
 
     # load embeddings
     embeddings_data = add_text_inversion_embeddings(pTextInvs+nTextInvs, pipe)
