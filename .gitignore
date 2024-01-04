@@ -3,6 +3,7 @@ prompts/*
 output/*
 image_inputs/*
 
+*.ignore*
 *.safetensors
 *.ckpt
 *.pt
