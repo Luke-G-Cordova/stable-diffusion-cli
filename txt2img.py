@@ -87,10 +87,9 @@ def start(
             use_safetensors=True,
         )
 
-
     # load embeddings
     embeddings_data = add_text_inversion_embeddings(pTextInvs+nTextInvs, pipe)
-    
+
     pipe.to(device_name)
     
     if embed_prompts:
@@ -102,7 +101,6 @@ def start(
             device = device_name
         )
 
-
     # set seeds
     generators = []
     seeds = []
@@ -111,7 +109,7 @@ def start(
             seeds.append(random.randrange(0, 1000000))
             generators.append(torch.Generator(device="cuda").manual_seed(seeds[-1]))
     else:
-        seeds.append(seed)
+        seeds = seeds.append(seed) * batch_size
         generators.append(torch.Generator(device="cuda").manual_seed(seeds[0]))
     print(f"{co.neutral}SEEDS USED: {co.yellow}{seeds}{co.reset}")
 

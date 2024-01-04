@@ -19,7 +19,7 @@ def get_prompt_embeddings(
     # If prompt is longer than negative prompt.
     if count_prompt >= count_negative_prompt:
         input_ids = pipe.tokenizer(
-            prompt, return_tensors = "pt", truncation = False
+            prompt, return_tensors = "pt", truncation = False,
         ).input_ids.to(device)
         shape_max_length = input_ids.shape[-1]
         negative_ids = pipe.tokenizer(
@@ -33,7 +33,7 @@ def get_prompt_embeddings(
     # If negative prompt is longer than prompt.
     else:
         negative_ids = pipe.tokenizer(
-            negative_prompt, return_tensors = "pt", truncation = False
+            negative_prompt, return_tensors = "pt", truncation = False,
         ).input_ids.to(device)
         shape_max_length = negative_ids.shape[-1]
         input_ids = pipe.tokenizer(
