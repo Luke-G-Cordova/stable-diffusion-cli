@@ -41,6 +41,7 @@ def start(
     allow_tf32=False,
     save_generation_data=True,
     out_dir="output",
+    out_name="",
     vae_path=None,
 ):
     # default cuda
@@ -155,13 +156,13 @@ def start(
         if not path.isdir(out_dir):
             print(f"{co.neutral}Making out_dir: {co.green}{out_dir}{co.reset}")
             os.mkdir(out_dir)
-        print(f"{co.neutral}saving to {co.green}{out_dir}/{seeds[i]}/{seeds[i]}.png{co.reset}")
+        print(f"{co.neutral}saving to {co.green}{out_dir}/{seeds[i]}/{out_name}{seeds[i]}.png{co.reset}")
         if not path.isdir(f"{out_dir}/{seeds[i]}"):
             os.mkdir(f"{out_dir}/{seeds[i]}")
-        image.save(f"{out_dir}/{seeds[i]}/{seeds[i]}.png")
+        image.save(f"{out_dir}/{seeds[i]}/{out_name}{seeds[i]}.png")
         
         if save_generation_data:
-            with open(f"output/{seeds[i]}/generation_data.json", 'w') as f:
+            with open(f"output/{seeds[i]}/{out_name}generation_data.json", 'w') as f:
                 f.write(json.dumps(generation_data(
                     prompt, 
                     negative_prompt,

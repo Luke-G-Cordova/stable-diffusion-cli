@@ -107,6 +107,12 @@ parser.add_argument(
     help="path to store generated images and generation data"
 )
 parser.add_argument(
+    "--out_name",
+    default="",
+    type=str,
+    help="path to store generated images and generation data"
+)
+parser.add_argument(
     "--batch_size",
     default=1,
     type=int,
@@ -155,6 +161,13 @@ parser.add_argument(
     type=str,
     help="path to custom vae file. If none is provided, will attempt to use default."
 )
+parser.add_argument(
+    "--pose_path",
+    default="models/poses",
+    type=str,
+    help="path to custom pose file. If none is provided, will attempt to use default."
+)
+
 
 args = parser.parse_args()
 
@@ -255,6 +268,7 @@ if args.task == "txt2img":
         allow_tf32=args.allow_tf32,
         save_generation_data=args.no_gen_data,
         out_dir=args.out_dir,
+        out_name=args.out_name,
         vae_path=args.vae_path,
     )
 elif args.task == "img2img":
@@ -276,8 +290,10 @@ elif args.task == "img2img":
         allow_tf32=args.allow_tf32,
         save_generation_data=args.no_gen_data,
         out_dir=args.out_dir,
+        out_name=args.out_name,
         image_path=args.image_path,
         image_strength=args.image_strength,
+        pose_path=args.pose_path,
     )
 else:
     print(f"{co.red}No current support for {args.task}{co.reset}")
