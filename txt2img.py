@@ -57,8 +57,8 @@ def start(
     trained_textual_inversions = get_trained_textual_inversions(embeddings_path)
 
     # parse the prompt and make embeddings if needed
-    prompt, pLora, pWeight, pTextInvs = parse_prompt(prompt, trained_textual_inversions)
-    negative_prompt, nLora, nWeight, nTextInvs = parse_prompt(negative_prompt, trained_textual_inversions)
+    prompt, pLora, pWeight, pTextInvs, _ = parse_prompt(prompt, trained_textual_inversions)
+    negative_prompt, nLora, nWeight, nTextInvs, _ = parse_prompt(negative_prompt, trained_textual_inversions)
 
     print(f"{co.neutral}PROMPT: {co.reset}{prompt}")
     print(f"{co.neutral}NEGATIVE_PROMPT: {co.reset}{negative_prompt}")
