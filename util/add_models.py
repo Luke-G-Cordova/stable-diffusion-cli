@@ -41,6 +41,20 @@ def add_lora(
     pipe.set_adapters(lora_names, lora_weights)
     return lora_gen_data_files
 
+def get_available_poses(pose_path):
+    possible_poses = {}
+    if path.isdir(pose_path):
+        for dirname in os.listdir(pose_path):
+            if path.isdir(path.join(pose_path, dirname)):
+                for file in os.listdir(path.join(pose_path, dirname)):
+                    if path.isfile(path.join(pose_path, dirname, file)) and path.splitext(file)[1] == '.png':
+                        possible_poses[path.splitext(file)[0]] = path.join(pose_path, dirname, file)
+            elif path.isfile(path.join(pose_path, dirname)) and path.splitext(dirname)[1] == '.png':
+                possible_poses[path.splitext(dirname)[0]] = path.join(pose_path, dirname)
+    else:
+        print(f"{co.neutral}Cannot find pose path: {co.red}{pose_path}{co.neutral} :Will not use embeddings{co.reset} ")
+    return possible_poses
+
 def  get_trained_textual_inversions(embeddings_path):
     possible_embeddings = {}
     if path.isdir(embeddings_path):
