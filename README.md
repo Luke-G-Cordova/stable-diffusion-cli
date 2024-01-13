@@ -7,9 +7,9 @@
 
 # Docs
 
-## How To's
+# How To's
 
-### [Inferencing:](https://huggingface.co/docs/diffusers/tutorials/using_peft_for_inference)
+## [Inferencing:](https://huggingface.co/docs/diffusers/tutorials/using_peft_for_inference)
 
 `$ python sdcli.py --model_path "model" --prompt "astronaut"`
 
@@ -27,11 +27,11 @@ Set the cfg or guidance scale using the `--guidance_scale` flag. This scale is t
 
 Set the batch size or the amount of photos generated using `--batch_size` flag. This variable is meant for generating many photos of the same prompt with different seeds and comparing to see how reliable the prompt is. This is not really the scope or purpose of this project but I included the functionality anyway. If you are looking for this functionality specifically, try out [Automatic1111](https://github.com/AUTOMATIC1111/stable-diffusion-webui)!
 
-### Prompt Syntax:
+## Prompt Syntax:
 
 The prompt parser takes the prompt and extracts the useful information from it so that it can then add the proper models without adding something that shouldn't be used. Currently the information the parser needs to extract are as follows:
 
-#### Lora names and lora weight.
+### Lora names and lora weight.
 
 The parser needs to know the `lora_name`, `lora_weight`, and it needs to know if it should add the loras trained words. The syntax to let the parser know this information is a string of the following format:
 
@@ -59,13 +59,13 @@ The `my_interesting_lora` would be applied to the model with a weight of .75 and
 
 `1boy, smiling, standing, sunset, elephant`
 
-#### Textual Inversion embeddings.
+### Textual Inversion embeddings.
 
 The parser needs to know which embeddings need to be included in the model. It does this by collecting all trained words from embeddings in the `--embeddings_path` and searching through the prompt for each trained word. If it finds one of the trained words in the prompt, it includes that embedding in the model. If you want to include an embedding, you must include its trained word in the prompt somewhere. This trained word does not get removed from the final prompt and is passed to the model for inference.
 
 If having trouble downloading embeddings reference [downloading](#downloading)
 
-#### Pose names.
+### Pose names.
 
 Currently the parser only supports the [openpose controlnet](https://huggingface.co/lllyasviel/sd-controlnet-openpose) but will support more in the future. Also poses are only supported with the `--task` flag set to `img2img` see [poses](#poses). To let the parser know which pose to include use the following syntax:
 
@@ -83,13 +83,13 @@ The `my_unique_pose` will be inputted to the model and the final prompt that get
 
 `five people, standing`
 
-#### Misc.
+### Misc.
 
 You can alternatively supply a prompt and negative prompt via separate files using the `--prompt_file` and `--negative_prompt_file` flags respectively. I find it much easier to use this feature because it allows for better editing of my prompts and I can pre save prompts this way. Do not set the `--prompt` or `--negative_prompt` flags if you wish to use files. Return characters or \n characters are ignored which enables formatting these files as lists.
 
 I included a commenting functionality to comment out parts of a prompt. Use `//` to comment out a line to be ignored by the parser. Anything after and including the `//` in a line will not be included in the final prompt.
 
-### Downloading:
+## Downloading:
 
 `$ python download.py --task "query" --query "some model"`
 
@@ -103,7 +103,7 @@ To reliably download a specific model ([Checkpoint](#checkpoint), [LoRA](#lora),
 
 When you have the version id, set the `--query` flag to that number.
 
-### [Checkpoint:](https://stable-diffusion-art.com/models/#:~:text=Updated%20December%205%2C%202023%20By,depends%20on%20the%20training%20images.)
+## [Checkpoint:](https://stable-diffusion-art.com/models/#:~:text=Updated%20December%205%2C%202023%20By,depends%20on%20the%20training%20images.)
 
 `$ python sdcli.py --model_path "path/to/model/" --prompt "astronaut"`
 
@@ -117,7 +117,7 @@ If `model_path` is not a recognizable name of a directory or file, the program w
 
 [Civitai](https://civitai.com/) and [Huggingface](https://huggingface.co/) both have several checkpoint models and other types of models for download. Also look at [downloading](#downloading).
 
-### [LoRA:](https://huggingface.co/blog/lora)
+## [LoRA:](https://huggingface.co/blog/lora)
 
 `$ python sdcli.py --model_path "model" --lora_path "path/to/lora_dir/" --prompt "astronaut, <lora:some_lora:.75>"`
 
@@ -125,31 +125,31 @@ This command applies `some_lora` with a weight of .75 and inferences. `some_lora
 
 All used lora must be referenced in the prompt using the syntax `<lora:{lora_name}:{lora_weight}>`. Any substring in the prompt that follows this syntax will be cut from the prompt so the final prompt will not include it. Also if your lora has any trigger words, you can specify `<lora:{lora_name}:{lora_weight}:add_trained>` and those trigger words will be added, comma separated, to the prompt. Go to [Prompt Syntax](#prompt-syntax) for more details.
 
-### [Samplers/Schedulers:](https://huggingface.co/docs/diffusers/api/schedulers/overview)
+## [Samplers/Schedulers:](https://huggingface.co/docs/diffusers/api/schedulers/overview)
 
 `$ python sdcli.py --model_path "model" --scheduler_type "dpm"`
 
 Currently the only schedulers available in this project are [pndm](https://huggingface.co/docs/diffusers/api/schedulers/pndm), [lms](https://huggingface.co/docs/diffusers/api/schedulers/lms_discrete), [ddim](https://huggingface.co/docs/diffusers/api/schedulers/ddim), [euler](https://huggingface.co/docs/diffusers/api/schedulers/euler), [euler-ancestral](https://huggingface.co/docs/diffusers/api/schedulers/euler_ancestral), and [dpm](https://huggingface.co/docs/diffusers/api/schedulers/multistep_dpm_solver). This project is set to always use [karras sigmas](https://github.com/AUTOMATIC1111/stable-diffusion-webui/discussions/4384#discussioncomment-4562593) at the moment.
 
-### Task - [txt2img](https://huggingface.co/docs/diffusers/api/pipelines/stable_diffusion/text2img), [img2img:](https://huggingface.co/docs/diffusers/api/pipelines/stable_diffusion/img2img)
+## Task - [txt2img](https://huggingface.co/docs/diffusers/api/pipelines/stable_diffusion/text2img), [img2img:](https://huggingface.co/docs/diffusers/api/pipelines/stable_diffusion/img2img)
 
 `$ python sdcli.py --model_path "model" --task "txt2img"`
 
 There are two tasks to choose from `txt2img` and `img2img`. With `txt2img` you can generate an image based on a prompt. With `img2img` you can generate an image given both a prompt and an input image. For `img2img` the flags `--image_path` and `--image_strength` are used. `--image_path` is the path to the input image, `--image_strength` is the amount of impact the image will have on the final photo between 0 and 1. The higher the strength, the more creativity or freedom the model will with the final photo and likewise the lower the strength, the more the final photo will resemble the original.
 
-### [Textual Inversions - Embeddings:](https://huggingface.co/docs/diffusers/using-diffusers/textual_inversion_inference)
+## [Textual Inversions - Embeddings:](https://huggingface.co/docs/diffusers/using-diffusers/textual_inversion_inference)
 
 `$ python sdcli.py --model_path "model" --embeddings_path "path/to/embeddings_dir/" --prompt "astronaut" --negative_prompt "embedding_trained_word"`
 
 Given `embedding_trained_word` is a trained word from one of the embeddings files at `--embeddings_path` this command will include the embedding. `embedding_trained_word` will not be removed from final prompt. Textual Inversions are often negative prompt concepts to help the model not generate these bad concepts. Look at [downloading](#downloading) for more details about downloading embeddings.
 
-### [Vae:](https://en.wikipedia.org/wiki/Stable_Diffusion#:~:text=Stable%20Diffusion%20consists%20of%203,semantic%20meaning%20of%20the%20image.)
+## [Vae:](https://en.wikipedia.org/wiki/Stable_Diffusion#:~:text=Stable%20Diffusion%20consists%20of%203,semantic%20meaning%20of%20the%20image.)
 
 `$ python sdcli.py --model_path "model" --vae_path "path/to/vae_file.safetensors"`
 
 To use a custom vae, provide a path to the vae file. This vae will then be applied to the model before inference.
 
-### [Poses:](https://huggingface.co/lllyasviel/sd-controlnet-openpose)
+## [Poses:](https://huggingface.co/lllyasviel/sd-controlnet-openpose)
 
 `$ python sdcli.py --model_path "model" --pose_path "path/to/pose_dir/" --task "img2img" --prompt "athlete, <pose:jumping_pose>"`
 
