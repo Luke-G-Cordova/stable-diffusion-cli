@@ -24,10 +24,10 @@ for arg in list(unparsed.values()):
         elif arg["type"] == "float":
             arg["type"] = float
     for key in arg:
-        if key != "args":
+        if key != "flags":
             kwargs[key] = arg[key] if arg[key] != "None" else None
     parser.add_argument(
-        *arg["args"],
+        *arg["flags"],
         **kwargs
     )
 
