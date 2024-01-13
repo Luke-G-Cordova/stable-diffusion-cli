@@ -1,0 +1,159 @@
+{
+  "model_path": {
+    "args": ["-mp", "--model_path"],
+    "default": "./models/stable-diffusion-v2",
+    "type": "str",
+    "help": "Path to the base model to run stable diffusion on. If evaluates to .ckpt or .safetensor file will convert to and use a huggingface diffusers model stored in ./models"
+  },
+  "scheduler_type": {
+    "args": ["-st", "--scheduler_type"],
+    "default": "pndm",
+    "type": "str",
+    "help": "scheduler type. One of ['pndm', 'lms', 'ddim', 'euler', 'euler-ancestral', 'dpm']"
+  },
+  "embeddings_path": {
+    "args": ["-ep", "--embeddings_path"],
+    "default": "models/embeddings",
+    "type": "str",
+    "help": "Path to directory containing embedding files."
+  },
+  "prompt": {
+    "args": ["-p", "--prompt"],
+    "default": "None",
+    "type": "str",
+    "help": "text prompt"
+  },
+  "negative_prompt": {
+    "args": ["-n", "--negative_prompt"],
+    "default": "None",
+    "type": "str",
+    "help": "negative text prompt"
+  },
+  "prompt_file": {
+    "args": ["-pp", "--prompt_file"],
+    "default": "prompts/p.txt",
+    "type": "str",
+    "help": "A file storing the prompt. --prompt flag must not be set to use this"
+  },
+  "negative_prompt_file": {
+    "args": ["-np", "--negative_prompt_file"],
+    "default": "prompts/n.txt",
+    "type": "str",
+    "help": "A file storing the negative prompt. --negative_prompt flag must not be set to use this"
+  },
+  "seed": {
+    "args": ["-s", "--seed"],
+    "default": -1,
+    "type": "int",
+    "help": "Seed. If seed is -1 a random seed will be generated and used"
+  },
+  "clip_skip": {
+    "args": ["-c", "--clip_skip"],
+    "default": 1,
+    "type": "int",
+    "help": "clip skip"
+  },
+  "inference_steps": {
+    "args": ["-i", "--inference_steps"],
+    "default": 30,
+    "type": "int",
+    "help": "amount of inference steps"
+  },
+  "guidance_scale": {
+    "args": ["-g", "-cfg", "--guidance_scale"],
+    "default": 7,
+    "type": "float",
+    "help": "guidance scale"
+  },
+  "width": {
+    "args": ["--width"],
+    "default": 512,
+    "type": "int",
+    "help": "width of output image"
+  },
+  "height": {
+    "args": ["--height"],
+    "default": 512,
+    "type": "int",
+    "help": "height of output image"
+  },
+  "task": {
+    "args": ["--task"],
+    "default": "txt2img",
+    "type": "str",
+    "help": "Task to preform, txt2img, img2img"
+  },
+  "lora_path": {
+    "args": ["-lp", "--lora_path"],
+    "default": "models/lora",
+    "type": "str",
+    "help": "path to directory storing lora"
+  },
+  "out_dir": {
+    "args": ["-op", "--out_dir"],
+    "default": "output",
+    "type": "str",
+    "help": "path to store generated images and generation data"
+  },
+  "out_name": {
+    "args": ["-on", "--out_name"],
+    "default": "",
+    "type": "str",
+    "help": "name added to output file along with its seed. Will store as <out_dir>/<out_name><seed>.png"
+  },
+  "batch_size": {
+    "args": ["-bs", "--batch_size"],
+    "default": 1,
+    "type": "int",
+    "help": "batch size"
+  },
+  "embed_prompts": {
+    "args": ["-e", "--embed_prompts"],
+    "action": "store_true",
+    "help": "For longer prompts with 77 or more tokens use this flag to first make them embeddings."
+  },
+  "help_list_lora": {
+    "args": ["-hl", "--help_list_lora"],
+    "action": "store_true",
+    "help": "Use this flag to find and list lora. This will only look in the models/lora directory."
+  },
+  "help_list_models": {
+    "args": ["-hm", "--help_list_models"],
+    "action": "store_true",
+    "help": "Use this flag to find and list lora. This will only look in the models/lora directory."
+  },
+  "allow_tf32": {
+    "args": ["-atf32", "--allow_tf32"],
+    "action": "store_true",
+    "help": "inference will go faster with slight inaccuracy"
+  },
+  "no_gen_data": {
+    "args": ["-ng", "--no_gen_data"],
+    "action": "store_false",
+    "help": "Setting this flag prevents generation data from being stored with images"
+  },
+  "image_path": {
+    "args": ["-ip", "--image_path"],
+    "default": "None",
+    "type": "str",
+    "help": "if task is img2img, this path indicates the input image"
+  },
+  "image_strength": {
+    "args": ["-is", "--image_strength"],
+    "default": 0.8,
+    "type": "float",
+    "help": "if task is img2img, this path indicates the input image"
+  },
+  "vae_path": {
+    "args": ["-vp", "--vae_path"],
+    "default": "None",
+    "type": "str",
+    "help": "path to custom vae file. If none is provided, will attempt to use default."
+  },
+  "pose_path": {
+    "args": ["-sp", "--pose_path"],
+    "default": "models/poses",
+    "type": "str",
+    "help": "path to custom pose file. If none is provided, will attempt to use default."
+  }
+}

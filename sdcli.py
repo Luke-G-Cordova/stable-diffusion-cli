@@ -10,164 +10,26 @@ import re
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument(
-    "--model_path",
-    default="./models/stable-diffusion-v2",
-    type=str,
-    help="Path to the base model to run stable diffusion on. If evaluates to .ckpt or .safetensor file will convert to and use a huggingface diffusers model stored in ./models"
-)
-parser.add_argument(
-    "--scheduler_type",
-    default="pndm",
-    type=str,
-    help="scheduler type. One of ['pndm', 'lms', 'ddim', 'euler', 'euler-ancestral', 'dpm']"
-)
-parser.add_argument(
-    "--embeddings_path",
-    default="models/embeddings",
-    type=str,
-    help="Path to directory containing embedding files."
-)
-parser.add_argument(
-    "--prompt",
-    default=None,
-    type=str,
-    help="text prompt"
-)
-parser.add_argument(
-    "--negative_prompt",
-    default=None,
-    type=str,
-    help="negative text prompt"
-)
-parser.add_argument(
-    "--prompt_file",
-    default="prompts/p.txt",
-    type=str,
-    help="A file storing the prompt. --prompt flag must not be set to use this"
-)
-parser.add_argument(
-    "--negative_prompt_file",
-    default="prompts/n.txt",
-    type=str,
-    help="A file storing the negative prompt. --negative_prompt flag must not be set to use this"
-)
-parser.add_argument(
-    "--seed",
-    default=-1,
-    type=int,
-    help="Seed. If seed is -1 a random seed will be generated and used"
-)
-parser.add_argument(
-    "--clip_skip",
-    default=1,
-    type=int,
-    help="clip skip"
-)
-parser.add_argument(
-    "--inference_steps",
-    default=30,
-    type=int,
-    help="amount of inference steps"
-)
-parser.add_argument(
-    "--guidance_scale",
-    default=7,
-    type=float,
-    help="guidance scale"
-)
-parser.add_argument(
-    "--width",
-    default=512,
-    type=int,
-    help="width of output image"
-)
-parser.add_argument(
-    "--height",
-    default=512,
-    type=int,
-    help="height of output image"
-)
-parser.add_argument(
-    "--task",
-    default="txt2img",
-    type=str,
-    help="Task to preform, txt2img, img2img"
-)
-parser.add_argument(
-    "--lora_path",
-    default="models/lora",
-    type=str,
-    help="path to directory storing lora"
-)
-parser.add_argument(
-    "--out_dir",
-    default="output",
-    type=str,
-    help="path to store generated images and generation data"
-)
-parser.add_argument(
-    "--out_name",
-    default="",
-    type=str,
-    help="path to store generated images and generation data"
-)
-parser.add_argument(
-    "--batch_size",
-    default=1,
-    type=int,
-    help="batch size"
-)
-parser.add_argument(
-    "--embed_prompts",
-    action="store_true",
-    help="For longer prompts with 77 or more tokens use this flag to first make them embeddings."
-)
-parser.add_argument(
-    "--help_list_lora",
-    action="store_true",
-    help="Use this flag to find and list lora. This will only look in the models/lora directory."
-)
-parser.add_argument(
-    "--help_list_models",
-    action="store_true",
-    help="Use this flag to find and list lora. This will only look in the models/lora directory."
-)
-parser.add_argument(
-    "--allow_tf32",
-    action="store_true",
-    help="inference will go faster with slight inaccuracy"
-)
-parser.add_argument(
-    "--no_gen_data",
-    action="store_false",
-    help="Setting this flag prevents generation data from being stored with images"
-)
-parser.add_argument(
-    "--image_path",
-    default=None,
-    type=str,
-    help="if task is img2img, this path indicates the input image"
-)
-parser.add_argument(
-    "--image_strength",
-    default=.8,
-    type=float,
-    help="if task is img2img, this path indicates the input image"
-)
-parser.add_argument(
-    "--vae_path",
-    default=None,
-    type=str,
-    help="path to custom vae file. If none is provided, will attempt to use default."
-)
-parser.add_argument(
-    "--pose_path",
-    default="models/poses",
-    type=str,
-    help="path to custom pose file. If none is provided, will attempt to use default."
-)
-
+with open("args.json", "r") as file:
+    unparsed = json.loads(file.read())
+for arg in list(unparsed.values()):
+    kwargs = {}
+    if "default" in arg and arg["default"] == "None":
+        arg["default"] = None
+    if "type" in arg:
+        if arg["type"] == "str":
+            arg["type"] = str
+        elif arg["type"] == "int":
+            arg["type"] = int
+        elif arg["type"] == "float":
+            arg["type"] = float
+    for key in arg:
+        if key != "args":
+            kwargs[key] = arg[key] if arg[key] != "None" else None
+    parser.add_argument(
+        *arg["args"],
+        **kwargs
+    )
 
 args = parser.parse_args()
 
