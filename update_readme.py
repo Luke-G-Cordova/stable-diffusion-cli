@@ -4,14 +4,14 @@ import re
 # prepare args to be inserted
 with open("args.json", "r") as f:
     args = json.loads(f.read())
-sdcli_params = "\n"
+sdcli_params = "\n\n<hr/>\n"
 for arg_name in args:
     arg = args[arg_name]
-    sdcli_params += f"\n> ### {arg_name}:\n>\n> {arg['help']}\n>\n> flags: `{arg['flags']}`\n>"
+    sdcli_params += f"\n ### {arg_name}:\n\n {arg['help']}\n\n flags: `{arg['flags']}`\n"
     for key in arg:
         if key != "help" and key != "flags":
-            sdcli_params += f"\n> {key}: `{arg[key]}`\n>"
-    sdcli_params += "\n"
+            sdcli_params += f"\n {key}: `{arg[key]}`\n"
+    sdcli_params += "\n<hr/>\n"
 
 
 

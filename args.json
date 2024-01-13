@@ -3,49 +3,49 @@
     "flags": ["-mp", "--model_path"],
     "default": "./models/stable-diffusion-v2",
     "type": "str",
-    "help": "Path to the base model to run stable diffusion on. If evaluates to .ckpt or .safetensor file will convert to and use a huggingface diffusers model stored in ./models"
+    "help": "Path to the base model checkpoint to run stable diffusion on. If evaluates to `.ckpt` or `.safetensor` file will convert to and use a huggingface diffusers model stored in `./models` by the same name as the original."
   },
   "scheduler_type": {
     "flags": ["-st", "--scheduler_type"],
     "default": "pndm",
     "type": "str",
-    "help": "scheduler type. One of ['pndm', 'lms', 'ddim', 'euler', 'euler-ancestral', 'dpm']"
+    "help": "Scheduler type also known as Sampler type. Can be one of `['pndm', 'lms', 'ddim', 'euler', 'euler-ancestral', 'dpm']`"
   },
   "embeddings_path": {
     "flags": ["-ep", "--embeddings_path"],
     "default": "models/embeddings",
     "type": "str",
-    "help": "Path to directory containing embedding files."
+    "help": "Path to directory containing textual inversion embedding files."
   },
   "prompt": {
     "flags": ["-p", "--prompt"],
     "default": "None",
     "type": "str",
-    "help": "text prompt"
+    "help": "Text prompt used for inferencing"
   },
   "negative_prompt": {
     "flags": ["-n", "--negative_prompt"],
     "default": "None",
     "type": "str",
-    "help": "negative text prompt"
+    "help": "Negative text prompt used for inferencing"
   },
   "prompt_file": {
     "flags": ["-pp", "--prompt_file"],
     "default": "prompts/p.txt",
     "type": "str",
-    "help": "A file storing the prompt. --prompt flag must not be set to use this"
+    "help": "A file storing the prompt. --prompt flag must not be set to use this."
   },
   "negative_prompt_file": {
     "flags": ["-np", "--negative_prompt_file"],
     "default": "prompts/n.txt",
     "type": "str",
-    "help": "A file storing the negative prompt. --negative_prompt flag must not be set to use this"
+    "help": "A file storing the negative prompt. --negative_prompt flag must not be set to use this."
   },
   "seed": {
     "flags": ["-s", "--seed"],
     "default": -1,
     "type": "int",
-    "help": "Seed. If seed is -1 a random seed will be generated and used"
+    "help": "Seed. If seed is -1 a random seed will be generated and used."
   },
   "clip_skip": {
     "flags": ["-c", "--clip_skip"],
@@ -57,49 +57,49 @@
     "flags": ["-i", "--inference_steps"],
     "default": 30,
     "type": "int",
-    "help": "amount of inference steps"
+    "help": "Amount of inference steps."
   },
   "guidance_scale": {
     "flags": ["-g", "-cfg", "--guidance_scale"],
     "default": 7,
     "type": "float",
-    "help": "guidance scale"
+    "help": "Guidance scale, cfg scale."
   },
   "width": {
     "flags": ["--width"],
     "default": 512,
     "type": "int",
-    "help": "width of output image"
+    "help": "Width of output image."
   },
   "height": {
     "flags": ["--height"],
     "default": 512,
     "type": "int",
-    "help": "height of output image"
+    "help": "Height of output image."
   },
   "task": {
     "flags": ["--task"],
     "default": "txt2img",
     "type": "str",
-    "help": "Task to preform, txt2img, img2img"
+    "help": "Task to preform. One of txt2img or img2img."
   },
   "lora_path": {
     "flags": ["-lp", "--lora_path"],
     "default": "models/lora",
     "type": "str",
-    "help": "path to directory storing lora"
+    "help": "Path to directory storing lora."
   },
   "out_dir": {
     "flags": ["-op", "--out_dir"],
     "default": "output",
     "type": "str",
-    "help": "path to store generated images and generation data"
+    "help": "Path to store generated images and generation data."
   },
   "out_name": {
     "flags": ["-on", "--out_name"],
     "default": "",
     "type": "str",
-    "help": "name added to output file along with its seed. Will store as <out_dir>/<out_name><seed>.png"
+    "help": "Name added to output file along with its seed. Will store as <out_dir>/<out_name><seed>.png"
   },
   "batch_size": {
     "flags": ["-bs", "--batch_size"],
@@ -125,35 +125,35 @@
   "allow_tf32": {
     "flags": ["-atf32", "--allow_tf32"],
     "action": "store_true",
-    "help": "inference will go faster with slight inaccuracy"
+    "help": "Inference will go faster with slight inaccuracy."
   },
   "no_gen_data": {
     "flags": ["-ng", "--no_gen_data"],
     "action": "store_false",
-    "help": "Setting this flag prevents generation data from being stored with images"
+    "help": "Setting this flag prevents generation data from being stored with images."
   },
   "image_path": {
     "flags": ["-ip", "--image_path"],
     "default": "None",
     "type": "str",
-    "help": "if task is img2img, this path indicates the input image"
+    "help": "If task is img2img, this path indicates the input image."
   },
   "image_strength": {
     "flags": ["-is", "--image_strength"],
     "default": 0.8,
     "type": "float",
-    "help": "if task is img2img, this path indicates the input image"
+    "help": "If task is img2img, this path indicates the input image."
   },
   "vae_path": {
     "flags": ["-vp", "--vae_path"],
     "default": "None",
     "type": "str",
-    "help": "path to custom vae file. If none is provided, will attempt to use default."
+    "help": "Path to custom vae file."
   },
   "pose_path": {
     "flags": ["-sp", "--pose_path"],
     "default": "models/poses",
     "type": "str",
-    "help": "path to custom pose file. If none is provided, will attempt to use default."
+    "help": "Path to custom pose directory. If none is provided, will attempt to use default."
   }
 }
