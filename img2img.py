@@ -89,6 +89,8 @@ def start(
         pose = pose[:, :, None]
         pose = np.concatenate([pose, pose, pose], axis=2)
         canny_image = Image.fromarray(pose)
+        width = canny_image.width
+        height = canny_image.height
         controlnet = ControlNetModel.from_pretrained("lllyasviel/sd-controlnet-openpose")
         pipeline = StableDiffusionControlNetPipeline
     else:
@@ -123,6 +125,7 @@ def start(
         )
 
     print(f"{co.neutral}Using Pose: {co.green}{use_pose}{co.reset}")
+    print(f"{co.neutral}Using width: {co.green}{width}{co.neutral}, and height: {co.green}{height}{co.reset}")
     # pipe.enable_model_cpu_offload()
     # load embeddings
     embeddings_data = add_text_inversion_embeddings(pTextInvs+nTextInvs, pipe)
