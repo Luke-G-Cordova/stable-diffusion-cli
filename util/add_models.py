@@ -20,7 +20,7 @@ def add_lora(
             elif path.isfile(lora + ".ckpt"):
                 lora = lora + ".ckpt"
             else:
-                print(f"{co.neutral}LoRA file: {co.red}{path.join(lora, '.safetensors')}{co.yellow}:{co.neutral}Will not use this lora{co.reset}")
+                print(f"{co.neutral}LoRA file: {co.red}{lora + '.safetensors'}{co.yellow}:{co.neutral}Will not use this lora{co.reset}")
                 del lora_names[i]
                 del lora_weights[i]
                 continue
