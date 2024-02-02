@@ -52,6 +52,7 @@ def start(
     image_strength=.8,
     vae_path=None,
     pose_path="",
+    save_init_image=True,
 ):
     # default cuda
     if torch.cuda.is_available():
@@ -75,6 +76,7 @@ def start(
     print(f"{co.neutral}NEGATIVE_PROMPT: {co.reset}{negative_prompt}")
 
     canny_image = None
+    save_image = None
     controlnet = None
     use_pose = None
     if len(pose_names) > 0:
@@ -83,6 +85,7 @@ def start(
         else:
             use_pose = available_poses[pose_names[0]]
         pose = load_image(use_pose)
+        save_image = pose
         
         pose = np.array(pose)
         pose = cv2.Canny(pose, 100, 200)
@@ -124,7 +127,8 @@ def start(
             controlnet=controlnet,
         )
 
-    print(f"{co.neutral}Using Pose: {co.green}{use_pose}{co.reset}")
+    if use_pose is not None:
+        print(f"{co.neutral}Using Pose: {co.green}{use_pose}{co.reset}")
     print(f"{co.neutral}Using width: {co.green}{width}{co.neutral}, and height: {co.green}{height}{co.reset}")
     # pipe.enable_model_cpu_offload()
     # load embeddings
@@ -206,6 +210,13 @@ def start(
         if not path.isdir(f"{out_dir}/{seeds[i]}"):
             os.mkdir(f"{out_dir}/{seeds[i]}")
         image.save(f"{out_dir}/{seeds[i]}/{out_name}{seeds[i]}.png")
+        if save_init_image:
+            init_image_name = path.split(use_pose)
+            init_image_name = f"{path.split(init_image_name[0])[1]}--{init_image_name[1]}"
+            if save_image is not None:
+                save_image.save(f"{out_dir}/{seeds[i]}/{init_image_name}")
+            else:
+                init_image.save(f"{out_dir}/{seeds[i]}/{init_image_name}")
         
         if save_generation_data:
             with open(f"{out_dir}/{seeds[i]}/{out_name}generation_data.json", 'w') as f:

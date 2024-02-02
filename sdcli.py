@@ -156,6 +156,7 @@ elif args.task == "img2img":
         image_path=args.image_path,
         image_strength=args.image_strength,
         pose_path=args.pose_path,
+        save_init_image=not(args.no_save_init_image),
     )
 else:
     print(f"{co.red}No current support for {args.task}{co.reset}")

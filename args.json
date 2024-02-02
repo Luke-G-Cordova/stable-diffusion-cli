@@ -155,5 +155,10 @@
     "default": "models/poses",
     "type": "str",
     "help": "Path to custom pose directory. If none is provided, will attempt to use default."
+  },
+  "no_save_init_image": {
+    "flags": ["-nsii", "--no_save_init_image"],
+    "action": "store_true",
+    "help": "Include this flag to not save the init image for img2img"
   }
 }
