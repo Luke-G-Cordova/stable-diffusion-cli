@@ -484,4 +484,14 @@ default: `models/poses`
 type: `str`
 
 <hr/>
+
+### no_save_init_image:
+
+Include this flag to not save the init image for img2img
+
+flags: `['-nsii', '--no_save_init_image']`
+
+action: `store_true`
+
+<hr/>
 <!-- sdcli_params_end -->
