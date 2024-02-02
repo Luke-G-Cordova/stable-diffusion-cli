@@ -7,6 +7,18 @@
 
 # Docs
 
+# Install and setup
+
+## [Conda:](https://conda.io/projects/conda/en/latest/user-guide/install/index.html)
+
+`$ conda env create -f environment.yml`
+
+Use this command to download and install the dependencies, this may take a while. Once this is done running you should have a conda environment named sdcli. Run the following to activate the environment:
+
+`$ conda activate sdcli`
+
+You are now working in the new environment and can start inferencing! See [below](#inferencing)
+
 # How To's
 
 ## [Inferencing:](https://huggingface.co/docs/diffusers/tutorials/using_peft_for_inference)
