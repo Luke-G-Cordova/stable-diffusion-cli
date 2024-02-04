@@ -11,13 +11,21 @@
 
 ## [Conda:](https://conda.io/projects/conda/en/latest/user-guide/install/index.html)
 
-`$ conda env create -f environment.yml`
+You can choose from 1 of 2 environments. The difference is that `environment_cu118.yml` uses `cuda 11.8` and `environment_cu121.yml` uses `cuda 12.1`. If you are not sure which cuda to use, you should probably just use `cuda 11.8` but I added 2 separate envs in case you need to support `cuda 12.1` instead.
+
+#### cuda 11.8
+
+`$ conda env create -f environment_cu118.yml`
+
+#### cuda 12.1
+
+`$ conda env create -f environment_cu121.yml`
 
 Use this command to download and install the dependencies, this may take a while. Once this is done running you should have a conda environment named sdcli. Run the following to activate the environment:
 
 `$ conda activate sdcli`
 
-You are now working in the new environment and can start inferencing! See [below](#inferencing)
+You are now working in the new environment and can start inferencing! See [below.](#inferencing)
 
 # How To's
 
