@@ -120,8 +120,8 @@ dependencies:
       - safetensors==0.4.2
       - tokenizers==0.15.1
       - transformers==4.37.2
-      - xformers==0.0.24+cu118
-      - --extra-index-url https://download.pytorch.org/whl/cu118
-      - torch==2.2.0+cu118
-      - torchaudio==2.2.0+cu118
-      - torchvision==0.17.0+cu118
+      - --extra-index-url https://download.pytorch.org/whl/cu121
+      - xformers==0.0.24
+      - torch==2.2.0+cu121
+      - torchaudio==2.2.0+cu121
+      - torchvision==0.17.0+cu121
