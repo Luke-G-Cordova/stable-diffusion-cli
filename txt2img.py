@@ -164,12 +164,12 @@ def start(
             if not path.isdir(out_dir):
                 os.mkdir(out_dir)
 
-        image_name = file_is_copy_name(f"{out_dir}/{out_name}{seeds[i]}.png")
+        image_name = file_is_copy_name(path.join(out_dir, f"{out_name}{seeds[i]}.png"))
         image.save(image_name)
         print(f"{co.neutral}saving to {co.green}{image_name}{co.reset}")
         
         if save_generation_data:
-            gen_data_name = file_is_copy_name(f"{out_dir}/{out_name}generation_data.json")
+            gen_data_name = file_is_copy_name(path.join(out_dir, f"{out_name}generation_data.json"))
             with open(gen_data_name, 'w') as f:
                 f.write(json.dumps(generation_data(
                     prompt, 
