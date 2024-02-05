@@ -1,4 +1,6 @@
 import json
+import os
+import re
 
 # ['pndm', 'lms', 'ddim', 'euler', 'euler-ancestral', 'dpm']
 def get_scheduler_import(scheduler_type):
@@ -64,3 +66,14 @@ def generation_data(
         "lora": lora_objs,
         "textual_inversion_embeddings":  embeddings_objs,
     }
+
+def file_is_copy_name(file):
+    while os.path.isfile(file):
+        f, ext = os.path.splitext(file)
+        match = re.search("\(\d+\)$", f)
+        if match is not None:
+            num = int(match.group()[1:-1]) + 1
+            file = re.split("\(\d+\)$", f)[0] + f"({num})" + ext
+        else:
+            file = f + "(1)" + ext
+    return file

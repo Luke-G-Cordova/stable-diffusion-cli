@@ -15,6 +15,7 @@ from util.add_models import (
     get_trained_textual_inversions 
 )
 from util.data import (
+    file_is_copy_name,
     generation_data,
     get_scheduler_import
 )
@@ -43,6 +44,7 @@ def start(
     out_dir="output",
     out_name="",
     vae_path=None,
+    group_by_seed=False,
 ):
     # default cuda
     if torch.cuda.is_available():
@@ -110,7 +112,8 @@ def start(
             seeds.append(random.randrange(0, 1000000))
             generators.append(torch.Generator(device="cuda").manual_seed(seeds[-1]))
     else:
-        seeds = seeds.append(seed) * batch_size
+        for _ in range(batch_size):
+            seeds.append(seed)
         generators.append(torch.Generator(device="cuda").manual_seed(seeds[0]))
     print(f"{co.neutral}SEEDS USED: {co.yellow}{seeds}{co.reset}")
 
@@ -156,13 +159,18 @@ def start(
         if not path.isdir(out_dir):
             print(f"{co.neutral}Making out_dir: {co.green}{out_dir}{co.reset}")
             os.mkdir(out_dir)
-        print(f"{co.neutral}saving to {co.green}{out_dir}/{seeds[i]}/{out_name}{seeds[i]}.png{co.reset}")
-        if not path.isdir(f"{out_dir}/{seeds[i]}"):
-            os.mkdir(f"{out_dir}/{seeds[i]}")
-        image.save(f"{out_dir}/{seeds[i]}/{out_name}{seeds[i]}.png")
+        if group_by_seed:
+            out_dir = f"{out_dir}/{seeds[i]}"
+            if not path.isdir(out_dir):
+                os.mkdir(out_dir)
+
+        image_name = file_is_copy_name(f"{out_dir}/{out_name}{seeds[i]}.png")
+        image.save(image_name)
+        print(f"{co.neutral}saving to {co.green}{image_name}{co.reset}")
         
         if save_generation_data:
-            with open(f"output/{seeds[i]}/{out_name}generation_data.json", 'w') as f:
+            gen_data_name = file_is_copy_name(f"{out_dir}/{out_name}generation_data.json")
+            with open(gen_data_name, 'w') as f:
                 f.write(json.dumps(generation_data(
                     prompt, 
                     negative_prompt,

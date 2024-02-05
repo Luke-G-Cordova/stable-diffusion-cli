@@ -101,6 +101,11 @@
     "type": "str",
     "help": "Name added to output file along with its seed. Will store as <out_dir>/<out_name><seed>.png"
   },
+  "group_by_seed": {
+    "flags": ["-gbs", "--group_by_seed"],
+    "action": "store_true",
+    "help": "This flag will store each generated image in a dir named after its seed. It's path will be <out_dir>/<seed>/<out_name><seed>.png"
+  },
   "batch_size": {
     "flags": ["-bs", "--batch_size"],
     "default": 1,

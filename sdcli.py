@@ -132,6 +132,7 @@ if args.task == "txt2img":
         out_dir=args.out_dir,
         out_name=args.out_name,
         vae_path=args.vae_path,
+        group_by_seed=args.group_by_seed,
     )
 elif args.task == "img2img":
     img2img.start(

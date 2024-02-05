@@ -395,6 +395,16 @@ type: `str`
 
 <hr/>
 
+### group_by_seed:
+
+This flag will store each generated image in a dir named after its seed. It's path will be <out_dir>/<seed>/<out_name><seed>.png
+
+flags: `['-gbs', '--group_by_seed']`
+
+action: `store_true`
+
+<hr/>
+
 ### batch_size:
 
 batch size
