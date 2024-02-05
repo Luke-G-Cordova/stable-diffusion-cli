@@ -169,7 +169,7 @@ def start(
         print(f"{co.neutral}saving to {co.green}{image_name}{co.reset}")
         
         if save_generation_data:
-            gen_data_name = file_is_copy_name(path.join(out_dir, f"{out_name}generation_data.json"))
+            gen_data_name = file_is_copy_name(path.join(out_dir, f"{out_name}{seeds[i]}_generation_data.json"))
             with open(gen_data_name, 'w') as f:
                 f.write(json.dumps(generation_data(
                     prompt, 

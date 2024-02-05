@@ -227,7 +227,7 @@ def start(
                 init_image.save(init_image_name)
         
         if save_generation_data:
-            gen_data_name = file_is_copy_name(path.join(out_dir, f"{out_name}generation_data.json"))
+            gen_data_name = file_is_copy_name(path.join(out_dir, f"{out_name}{seeds[i]}_generation_data.json"))
             with open(gen_data_name, 'w') as f:
                 f.write(json.dumps(generation_data(
                     prompt, 
