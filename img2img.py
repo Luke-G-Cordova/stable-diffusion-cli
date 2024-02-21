@@ -7,6 +7,7 @@ from diffusers import(
 from diffusers.utils import load_image
 import os
 from os import path
+import re
 import numpy as np
 import torch
 import random
@@ -84,8 +85,16 @@ def start(
     if len(pose_names) > 0:
         if pose_names[0] == "random":
             use_pose = random.sample(list(available_poses.values()), 1)[0]
-        else:
+        elif pose_names[0] in available_poses:
             use_pose = available_poses[pose_names[0]]
+        else:
+            all_pose_names = list(available_poses.keys())
+            possible_poses = []
+            for p in all_pose_names:
+               if re.search(pose_names[0], p):
+                   possible_poses.append(p)
+            use_pose = available_poses[random.sample(possible_poses, 1)[0]]
+
         pose = load_image(use_pose)
         save_image = pose
         
