@@ -18,18 +18,11 @@ def get_prompt_embeddings(pipeline, prompt, negative_prompt, split_character, de
     count_negative_prompt = len(negative_prompt.split(split_character))
 
     # create the tensor based on which prompt is longer
-    if count_prompt >= count_negative_prompt:
-        input_ids = pipeline.tokenizer(prompt, return_tensors="pt", truncation=False).input_ids.to(device)
-        shape_max_length = input_ids.shape[-1]
-        negative_ids = pipeline.tokenizer(negative_prompt, truncation=False, padding="max_length",
-                                          max_length=shape_max_length, return_tensors="pt").input_ids.to(device)
-
-    else:
-        negative_ids = pipeline.tokenizer(negative_prompt, return_tensors="pt", truncation=False).input_ids.to(device)
-        shape_max_length = negative_ids.shape[-1]
-        input_ids = pipeline.tokenizer(prompt, return_tensors="pt", truncation=False, padding="max_length",
-                                       max_length=shape_max_length).input_ids.to(device)
-
+    # if count_prompt >= count_negative_prompt:
+    input_ids = pipeline.tokenizer(prompt, return_tensors="pt", truncation=False).input_ids.to(device)
+    shape_max_length = input_ids.shape[-1]
+    negative_ids = pipeline.tokenizer(negative_prompt, truncation=False, padding="max_length",
+                                        max_length=shape_max_length, return_tensors="pt").input_ids.to(device)
     concat_embeds = []
     neg_embeds = []
     for i in range(0, shape_max_length, max_length):
@@ -38,6 +31,21 @@ def get_prompt_embeddings(pipeline, prompt, negative_prompt, split_character, de
     
     prompt_embeddings = torch.cat(concat_embeds, dim=1)
     negative_prompt_embeddings = torch.cat(neg_embeds, dim=1)
+
+    if prompt_embeddings.size() != negative_prompt_embeddings.size():
+        negative_ids = pipeline.tokenizer(negative_prompt, return_tensors="pt", truncation=False).input_ids.to(device)
+        shape_max_length = negative_ids.shape[-1]
+        input_ids = pipeline.tokenizer(prompt, return_tensors="pt", truncation=False, padding="max_length",
+                                       max_length=shape_max_length).input_ids.to(device)
+        concat_embeds = []
+        neg_embeds = []
+        for i in range(0, shape_max_length, max_length):
+            concat_embeds.append(pipeline.text_encoder(input_ids[:, i: i + max_length])[0])
+            neg_embeds.append(pipeline.text_encoder(negative_ids[:, i: i + max_length])[0])
+        
+        prompt_embeddings = torch.cat(concat_embeds, dim=1)
+        negative_prompt_embeddings = torch.cat(neg_embeds, dim=1)
+
     # print(prompt_embeddings.size)
     # print(prompt_embeddings.shape)
     # print(negative_prompt_embeddings.size)
