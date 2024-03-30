@@ -53,7 +53,7 @@ def get_prompt_embeddings(pipeline, prompt, negative_prompt, split_character, de
 
     return prompt_embeddings, negative_prompt_embeddings
 
-def parse_prompt(prompt, trained_textual_inversions):
+def parse_prompt(prompt, trained_textual_inversions, lora_path):
     prompt = prompt.strip()
     lines = prompt.split("\n")
     pieces = []
@@ -92,7 +92,7 @@ def parse_prompt(prompt, trained_textual_inversions):
                 name.append(lora_info[1])
                 weight.append(float(lora_info[2]))
                 if len(lora_info) == 4:
-                    with open(path.join("models", "lora", lora_info[1], "info.json"), 'r') as f:
+                    with open(path.join(lora_path, lora_info[1], "info.json"), 'r') as f:
                         jf = json.loads(f.read())
                         for p in jf["trainedWords"]:
                             if p.strip() != "":

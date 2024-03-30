@@ -524,4 +524,16 @@ flags: `['-nsii', '--no_save_init_image']`
 action: `store_true`
 
 <hr/>
+
+### control_net_path:
+
+Path to custom control net. If none is provided, will attempt to use default.
+
+flags: `['-cnp', '--control_net_path']`
+
+default: `models/control_net`
+
+type: `str`
+
+<hr/>
 <!-- sdcli_params_end -->

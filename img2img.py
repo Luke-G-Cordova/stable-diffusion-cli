@@ -56,6 +56,7 @@ def start(
     pose_path="",
     save_init_image=True,
     group_by_seed=False,
+    control_net_path="lllyasviel/sd-controlnet-openpose",
 ):
     # default cuda
     if torch.cuda.is_available():
@@ -72,8 +73,8 @@ def start(
     available_poses = get_available_poses(pose_path)
 
     # parse the prompt and make embeddings if needed
-    prompt, pLora, pWeight, pTextInvs, pose_names = parse_prompt(prompt, trained_textual_inversions)
-    negative_prompt, nLora, nWeight, nTextInvs, _ = parse_prompt(negative_prompt, trained_textual_inversions)
+    prompt, pLora, pWeight, pTextInvs, pose_names = parse_prompt(prompt, trained_textual_inversions, lora_path)
+    negative_prompt, nLora, nWeight, nTextInvs, _ = parse_prompt(negative_prompt, trained_textual_inversions, lora_path)
 
     print(f"{co.neutral}PROMPT: {co.reset}{prompt}")
     print(f"{co.neutral}NEGATIVE_PROMPT: {co.reset}{negative_prompt}")
@@ -105,7 +106,7 @@ def start(
         canny_image = Image.fromarray(pose)
         width = canny_image.width
         height = canny_image.height
-        controlnet = ControlNetModel.from_pretrained("lllyasviel/sd-controlnet-openpose")
+        controlnet = ControlNetModel.from_pretrained(control_net_path)
         pipeline = StableDiffusionControlNetPipeline
     else:
         pipeline = AutoPipelineForImage2Image
